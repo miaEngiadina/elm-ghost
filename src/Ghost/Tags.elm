@@ -14,7 +14,7 @@ type alias Tag =
     , description : Maybe String
     , feature_image : Maybe String
     , visibility : String
-    , meta : Misc.Meta
+    , meta : Misc.TID
     , url : String
     }
 
@@ -38,7 +38,7 @@ decodeTag =
         (JD.field "description" (JD.maybe JD.string))
         (JD.field "feature_image" (JD.maybe JD.string))
         (JD.field "visibility" JD.string)
-        (Misc.metaDecoder "meta")
+        (Misc.tidDecoder "meta")
         (JD.field "url" JD.string)
 
 

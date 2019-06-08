@@ -19,12 +19,12 @@ type alias Post =
     , feature_image : Maybe String
     , featured : Bool
     , page : Bool
-    , meta : Misc.Meta
+    , meta : Misc.TID
     , at : Misc.At
     , custom_excerpt : Maybe String
     , codeinjection : Misc.HeaderFooter
-    , og : Misc.Meta
-    , twitter : Misc.Meta
+    , og : Misc.TID
+    , twitter : Misc.TID
     , custom_template : Maybe String
     , canonical_url : Maybe String
     , primary_author : Maybe String
@@ -56,12 +56,12 @@ toPost =
         |> JDx.andMap (JD.field "feature_image" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "featured" JD.bool)
         |> JDx.andMap (JD.field "page" JD.bool)
-        |> JDx.andMap (Misc.metaDecoder "meta")
+        |> JDx.andMap (Misc.tidDecoder "meta")
         |> JDx.andMap Misc.atDecoder
         |> JDx.andMap (JD.field "custom_excerpt" (JD.maybe JD.string))
         |> JDx.andMap (Misc.headerFooterDecoder "codeinjection")
-        |> JDx.andMap (Misc.metaDecoder "og")
-        |> JDx.andMap (Misc.metaDecoder "twitter")
+        |> JDx.andMap (Misc.tidDecoder "og")
+        |> JDx.andMap (Misc.tidDecoder "twitter")
         |> JDx.andMap (JD.field "custom_template" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "canonical_url" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "primary_author" (JD.maybe JD.string))

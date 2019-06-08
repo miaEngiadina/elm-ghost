@@ -17,7 +17,7 @@ type alias Author =
     , website : Maybe String
     , location : Maybe String
     , facebook : Maybe String
-    , meta : Misc.Meta
+    , meta : Misc.TID
     , url : String
     }
 
@@ -44,7 +44,7 @@ toAuthor =
         |> JDx.andMap (JD.field "website" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "location" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "facebook" (JD.maybe JD.string))
-        |> JDx.andMap (Misc.metaDecoder "meta")
+        |> JDx.andMap (Misc.tidDecoder "meta")
         |> JDx.andMap (JD.field "url" JD.string)
 
 

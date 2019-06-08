@@ -49,9 +49,9 @@ toSettings =
         |> JDx.andMap (JD.field "twitter" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "lang" JD.string)
         |> JDx.andMap (JD.field "timezone" (JD.maybe JD.string))
-        |> JDx.andMap Misc.headerFooterDecoder
+        |> JDx.andMap (Misc.headerFooterDecoder "ghost")
         |> JDx.andMap (JD.field "navigation" (JD.list toNavigation))
-        |> JDx.andMap Misc.headerFooterDecoder
+        |> JDx.andMap (Misc.headerFooterDecoder "codeinjection")
 
 
 toNavigation : JD.Decoder Navigation

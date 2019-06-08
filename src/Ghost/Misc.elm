@@ -1,10 +1,10 @@
 module Ghost.Misc exposing
     ( At
     , HeaderFooter
-    , Meta
+    , TID
     , atDecoder
     , headerFooterDecoder
-    , metaDecoder
+    , tidDecoder
     )
 
 import Ghost.Log as Log
@@ -14,16 +14,16 @@ import Json.Decode.Extra as JDx
 import Time
 
 
-type alias Meta =
+type alias TID =
     { title : Maybe String
     , image : Maybe String
     , description : Maybe String
     }
 
 
-metaDecoder : String -> JD.Decoder Meta
-metaDecoder key =
-    JD.map3 Meta
+tidDecoder : String -> JD.Decoder TID
+tidDecoder key =
+    JD.map3 TID
         (JD.maybe (JD.field (key ++ "_title") JD.string))
         (JD.maybe (JD.field (key ++ "_image") JD.string))
         (JD.maybe (JD.field (key ++ "_description") JD.string))

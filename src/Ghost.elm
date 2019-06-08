@@ -6,7 +6,7 @@ module Ghost exposing
     , Tag
     , author
     , authors
-    , init
+    , config
     , posts
     , tags
     )
@@ -44,20 +44,20 @@ type alias Tag =
 
 
 urlFrom : Config -> String -> String
-urlFrom config value =
-    config.url
+urlFrom ghost value =
+    ghost.url
         ++ "/ghost/api/"
-        ++ config.version
+        ++ ghost.version
         ++ "/content/"
         ++ value
         ++ "/?key="
-        ++ config.key
+        ++ ghost.key
 
 
 http : JD.Decoder g -> String -> Config -> (Result Http.Error g -> msg) -> Cmd msg
-http decoder get config msg =
+http decoder get ghost msg =
     Http.get
-        { url = urlFrom config get
+        { url = urlFrom ghost get
         , expect = Http.expectJson msg decoder
         }
 
@@ -87,6 +87,11 @@ posts =
     http Post.decoder Post.get
 
 
+post : String -> Config -> (Result Http.Error (List Post) -> msg) -> Cmd msg
+post id_ =
+    http Post.decoder (Post.get ++ "/" ++ id_)
+
+
 settings : Config -> (Result Http.Error Settings -> msg) -> Cmd msg
 settings =
     http Settings.decoder Settings.get
@@ -97,8 +102,8 @@ tags =
     http Tag.decoder Tag.get
 
 
-init : String -> String -> String -> Config
-init url =
+config : String -> String -> String -> Config
+config url =
     Config <|
         if String.endsWith "/" url then
             String.dropRight 1 url
