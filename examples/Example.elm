@@ -69,7 +69,7 @@ init _ =
 
 type Msg
     = Load
-    | GotText (Result Ghost.Error (List Ghost.Post))
+    | GotText (Result Ghost.Error ( List Ghost.Post, Ghost.Meta ))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -78,14 +78,13 @@ update msg model =
         Load ->
             ( model
             , Ghost.Params.empty
-                |> Ghost.Params.fields "title,url"
-                |> Ghost.Params.limit 1
+                |> Ghost.Params.limit 3
                 |> Ghost.posts model.ghost GotText
             )
 
         GotText result ->
             case result of
-                Ok fullText ->
+                Ok ( fullText, _ ) ->
                     ( { model
                         | state = Success
                         , rslt = Just fullText

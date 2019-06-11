@@ -1,7 +1,8 @@
-module Ghost.Meta exposing (Meta, decoder, uid, view)
+module Ghost.Meta exposing (Meta, decoder, empty, uid, view)
 
 import Html exposing (Html)
 import Json.Decode as JD
+import Json.Decode.Extra as JDx
 
 
 type alias Meta =
@@ -14,14 +15,19 @@ type alias Meta =
     }
 
 
+empty : Meta
+empty =
+    Meta 0 0 0 0 Nothing Nothing
+
+
 uid : String
 uid =
     "meta"
 
 
-decoder : JD.Decoder Meta
-decoder =
-    JD.field uid (JD.field "pagination" toMeta)
+decoder : JD.Decoder x -> JD.Decoder ( x, Meta )
+decoder prev =
+    prev |> JD.map Tuple.pair |> JDx.andMap (JD.field uid (JD.field "pagination" toMeta))
 
 
 toMeta : JD.Decoder Meta
