@@ -3,6 +3,7 @@ module Ghost exposing
     , Config
     , Error(..)
     , Meta
+    , Params
     , Post
     , Settings
     , Tag
@@ -27,6 +28,7 @@ module Ghost exposing
 import Ghost.Author as Author
 import Ghost.Error as Error
 import Ghost.Meta as Meta
+import Ghost.Params as Params
 import Ghost.Post as Post
 import Ghost.Settings as Settings
 import Ghost.Tag as Tag
@@ -40,6 +42,10 @@ type alias Config =
     , key : String
     , version : String
     }
+
+
+type alias Params =
+    Params.Params
 
 
 type alias Author =
@@ -67,16 +73,16 @@ type Error
     | HttpError Http.Error
 
 
-urlFrom : Config -> String -> String
-urlFrom ghost value =
-    ghost.url
+urlFrom : Config -> Params -> String -> String
+urlFrom c p value =
+    c.url
         ++ "/ghost/api/"
-        ++ ghost.version
+        ++ c.version
         ++ "/content/"
         ++ value
         ++ "/?key="
-        ++ ghost.key
-        ++ "&include=authors,tags"
+        ++ c.key
+        ++ Params.toString p
 
 
 httpErr : Http.Error -> Result Error value
@@ -117,11 +123,11 @@ responseHandler decoder response =
                     Ok result
 
 
-http : JD.Decoder a -> String -> Config -> (Result Error a -> msg) -> Cmd msg
-http decoder get ghost msg =
+http : JD.Decoder a -> String -> Config -> (Result Error a -> msg) -> Params -> Cmd msg
+http decoder get ghost msg params =
     { method = "get"
     , headers = []
-    , url = urlFrom ghost get
+    , url = urlFrom ghost params get
     , body = Http.emptyBody
     , resolver = decoder |> responseHandler |> Http.stringResolver
     , timeout = Nothing
@@ -130,67 +136,67 @@ http decoder get ghost msg =
         |> Task.attempt msg
 
 
-authors : Config -> (Result Error (List Author) -> msg) -> Cmd msg
+authors : Config -> (Result Error (List Author) -> msg) -> Params -> Cmd msg
 authors =
     http Author.decoder Author.uid
 
 
-authorsById : String -> Config -> (Result Error (List Author) -> msg) -> Cmd msg
+authorsById : String -> Config -> (Result Error (List Author) -> msg) -> Params -> Cmd msg
 authorsById id_ =
     http Author.decoder (Author.uid ++ "/" ++ id_)
 
 
-authorsBySlug : String -> Config -> (Result Error (List Author) -> msg) -> Cmd msg
+authorsBySlug : String -> Config -> (Result Error (List Author) -> msg) -> Params -> Cmd msg
 authorsBySlug id_ =
     http Author.decoder (Author.uid ++ "/slug" ++ id_)
 
 
-pages : Config -> (Result Error (List Post) -> msg) -> Cmd msg
+pages : Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 pages =
     http Post.decoder "pages"
 
 
-pagesById : String -> Config -> (Result Error (List Post) -> msg) -> Cmd msg
+pagesById : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 pagesById id_ =
     http Post.decoder ("pages/" ++ id_)
 
 
-pagesBySlug : String -> Config -> (Result Error (List Post) -> msg) -> Cmd msg
+pagesBySlug : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 pagesBySlug id_ =
     http Post.decoder ("pages/slug/" ++ id_)
 
 
-posts : Config -> (Result Error (List Post) -> msg) -> Cmd msg
+posts : Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 posts =
     http Post.decoder Post.uid
 
 
-postsById : String -> Config -> (Result Error (List Post) -> msg) -> Cmd msg
+postsById : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 postsById id_ =
     http Post.decoder (Post.uid ++ "/" ++ id_)
 
 
-postsBySlug : String -> Config -> (Result Error (List Post) -> msg) -> Cmd msg
+postsBySlug : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 postsBySlug id_ =
     http Post.decoder (Post.uid ++ "/slug/" ++ id_)
 
 
-settings : Config -> (Result Error Settings -> msg) -> Cmd msg
+settings : Config -> (Result Error Settings -> msg) -> Params -> Cmd msg
 settings =
     http Settings.decoder Settings.uid
 
 
-tags : Config -> (Result Error (List Tag) -> msg) -> Cmd msg
+tags : Config -> (Result Error (List Tag) -> msg) -> Params -> Cmd msg
 tags =
     http Tag.decoder Tag.uid
 
 
-tagsById : String -> Config -> (Result Error (List Tag) -> msg) -> Cmd msg
+tagsById : String -> Config -> (Result Error (List Tag) -> msg) -> Params -> Cmd msg
 tagsById id_ =
     http Tag.decoder (Tag.uid ++ "/" ++ id_)
 
 
-tagsBySlug : String -> Config -> (Result Error (List Tag) -> msg) -> Cmd msg
+tagsBySlug : String -> Config -> (Result Error (List Tag) -> msg) -> Params -> Cmd msg
 tagsBySlug id_ =
     http Tag.decoder (Tag.uid ++ "/slug/" ++ id_)
 

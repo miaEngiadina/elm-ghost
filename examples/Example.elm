@@ -12,6 +12,7 @@ module Example exposing
 import Browser
 import Ghost
 import Ghost.Author
+import Ghost.Params
 import Ghost.Post
 import Ghost.Settings
 import Ghost.Tag
@@ -76,7 +77,10 @@ update msg model =
     case msg of
         Load ->
             ( model
-            , Ghost.posts model.ghost GotText
+            , Ghost.Params.empty
+                |> Ghost.Params.fields "title,url"
+                |> Ghost.Params.limit 1
+                |> Ghost.posts model.ghost GotText
             )
 
         GotText result ->

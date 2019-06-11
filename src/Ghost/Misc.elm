@@ -4,6 +4,7 @@ module Ghost.Misc exposing
     , TID
     , atDecoder
     , headerFooterDecoder
+    , map
     , tidDecoder
     )
 
@@ -30,18 +31,18 @@ tidDecoder key =
 
 
 type alias At =
-    { created : Time.Posix
-    , updated : Time.Posix
-    , published : Time.Posix
+    { created : Maybe Time.Posix
+    , updated : Maybe Time.Posix
+    , published : Maybe Time.Posix
     }
 
 
 atDecoder : JD.Decoder At
 atDecoder =
     JD.map3 At
-        (JD.field "created_at" JDx.datetime)
-        (JD.field "updated_at" JDx.datetime)
-        (JD.field "published_at" JDx.datetime)
+        (JD.maybe (JD.field "created_at" JDx.datetime))
+        (JD.maybe (JD.field "updated_at" JDx.datetime))
+        (JD.maybe (JD.field "published_at" JDx.datetime))
 
 
 type alias HeaderFooter =
@@ -55,3 +56,8 @@ headerFooterDecoder key =
     JD.map2 HeaderFooter
         (JD.maybe (JD.field (key ++ "_head") JD.string))
         (JD.maybe (JD.field (key ++ "_foot") JD.string))
+
+
+map : JD.Decoder a -> JD.Decoder (Maybe a -> b) -> JD.Decoder b
+map =
+    JD.maybe >> JDx.andMap

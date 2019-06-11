@@ -1,15 +1,15 @@
 module Ghost.Author exposing (Author, decoder, uid, view)
 
 import Ghost.Log as Log
-import Ghost.Misc as Misc
+import Ghost.Misc as Misc exposing (map)
 import Html exposing (Html)
 import Json.Decode as JD
 import Json.Decode.Extra as JDx
 
 
 type alias Author =
-    { id_ : String
-    , name : String
+    { id_ : Maybe String
+    , name : Maybe String
     , slug : Maybe String
     , profile_image : Maybe String
     , cover_image : Maybe String
@@ -18,7 +18,7 @@ type alias Author =
     , location : Maybe String
     , facebook : Maybe String
     , meta : Misc.TID
-    , url : String
+    , url : Maybe String
     }
 
 
@@ -39,17 +39,17 @@ decoder =
 toAuthor : JD.Decoder Author
 toAuthor =
     JD.succeed Author
-        |> JDx.andMap (JD.field "id" JD.string)
-        |> JDx.andMap (JD.field "name" JD.string)
-        |> JDx.andMap (JD.field "slug" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "profile_image" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "cover_image" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "bio" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "website" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "location" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "facebook" (JD.maybe JD.string))
+        |> map (JD.field "id" JD.string)
+        |> map (JD.field "name" JD.string)
+        |> map (JD.field "slug" JD.string)
+        |> map (JD.field "profile_image" JD.string)
+        |> map (JD.field "cover_image" JD.string)
+        |> map (JD.field "bio" JD.string)
+        |> map (JD.field "website" JD.string)
+        |> map (JD.field "location" JD.string)
+        |> map (JD.field "facebook" JD.string)
         |> JDx.andMap (Misc.tidDecoder "meta")
-        |> JDx.andMap (JD.field "url" JD.string)
+        |> map (JD.field "url" JD.string)
 
 
 view : Author -> Html msg
@@ -57,15 +57,15 @@ view author =
     Html.div []
         [ Log.string "id" author.id_
         , Log.string "name" author.name
-        , Log.string_null "slug" author.slug
-        , Log.string_null "profile_image" author.profile_image
-        , Log.string_null "cover_image" author.cover_image
-        , Log.string_null "bio" author.bio
-        , Log.string_null "website" author.website
-        , Log.string_null "location" author.location
-        , Log.string_null "facebook" author.facebook
-        , Log.string_null "meta_title" author.meta.title
-        , Log.string_null "meta_description" author.meta.description
+        , Log.string "slug" author.slug
+        , Log.string "profile_image" author.profile_image
+        , Log.string "cover_image" author.cover_image
+        , Log.string "bio" author.bio
+        , Log.string "website" author.website
+        , Log.string "location" author.location
+        , Log.string "facebook" author.facebook
+        , Log.string "meta_title" author.meta.title
+        , Log.string "meta_description" author.meta.description
         , Log.string "url" author.url
         , Html.hr [] []
         ]

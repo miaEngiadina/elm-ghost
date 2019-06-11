@@ -8,14 +8,14 @@ import Json.Decode.Extra as JDx
 
 
 type alias Tag =
-    { id_ : String
-    , name : String
+    { id_ : Maybe String
+    , name : Maybe String
     , slug : Maybe String
     , description : Maybe String
     , feature_image : Maybe String
-    , visibility : String
+    , visibility : Maybe String
     , meta : Misc.TID
-    , url : String
+    , url : Maybe String
     }
 
 
@@ -32,14 +32,14 @@ decoder =
 decodeTag : JD.Decoder Tag
 decodeTag =
     JD.map8 Tag
-        (JD.field "id" JD.string)
-        (JD.field "name" JD.string)
-        (JD.field "slug" (JD.maybe JD.string))
-        (JD.field "description" (JD.maybe JD.string))
-        (JD.field "feature_image" (JD.maybe JD.string))
-        (JD.field "visibility" JD.string)
+        (JD.maybe (JD.field "id" JD.string))
+        (JD.maybe (JD.field "name" JD.string))
+        (JD.maybe (JD.field "slug" JD.string))
+        (JD.maybe (JD.field "description" JD.string))
+        (JD.maybe (JD.field "feature_image" JD.string))
+        (JD.maybe (JD.field "visibility" JD.string))
         (Misc.tidDecoder "meta")
-        (JD.field "url" JD.string)
+        (JD.maybe (JD.field "url" JD.string))
 
 
 view : Tag -> Html msg
@@ -47,12 +47,12 @@ view tag =
     Html.div []
         [ Log.string "id" tag.id_
         , Log.string "name" tag.name
-        , Log.string_null "slug" tag.slug
-        , Log.string_null "description" tag.description
-        , Log.string_null "feature_image" tag.feature_image
+        , Log.string "slug" tag.slug
+        , Log.string "description" tag.description
+        , Log.string "feature_image" tag.feature_image
         , Log.string "visibility" tag.visibility
-        , Log.string_null "meta_title" tag.meta.title
-        , Log.string_null "meta_description" tag.meta.description
+        , Log.string "meta_title" tag.meta.title
+        , Log.string "meta_description" tag.meta.description
         , Log.string "url" tag.url
         , Html.hr [] []
         ]
