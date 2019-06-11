@@ -1,4 +1,4 @@
-module Ghost.Authors exposing (Author, decoder, get, view)
+module Ghost.Author exposing (Author, decoder, uid, view)
 
 import Ghost.Log as Log
 import Ghost.Misc as Misc
@@ -22,14 +22,18 @@ type alias Author =
     }
 
 
-get : String
-get =
+
+--authorsById : String ->
+
+
+uid : String
+uid =
     "authors"
 
 
 decoder : JD.Decoder (List Author)
 decoder =
-    JD.field get (JD.list toAuthor)
+    JD.field uid (JD.list toAuthor)
 
 
 toAuthor : JD.Decoder Author

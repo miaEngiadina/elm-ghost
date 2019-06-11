@@ -1,4 +1,4 @@
-module Ghost.Tags exposing (Tag, decoder, get, view)
+module Ghost.Tag exposing (Tag, decoder, uid, view)
 
 import Ghost.Log as Log
 import Ghost.Misc as Misc
@@ -19,14 +19,14 @@ type alias Tag =
     }
 
 
-get : String
-get =
+uid : String
+uid =
     "tags"
 
 
 decoder : JD.Decoder (List Tag)
 decoder =
-    JD.field get (JD.list decodeTag)
+    JD.field uid (JD.list decodeTag)
 
 
 decodeTag : JD.Decoder Tag

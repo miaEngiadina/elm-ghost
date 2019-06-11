@@ -1,4 +1,4 @@
-module Ghost.Settings exposing (Settings, decoder, get, view)
+module Ghost.Settings exposing (Settings, decoder, uid, view)
 
 import Ghost.Log as Log
 import Ghost.Misc as Misc
@@ -27,14 +27,14 @@ type alias Navigation =
     { label : String, url : String }
 
 
-get : String
-get =
+uid : String
+uid =
     "settings"
 
 
 decoder : JD.Decoder Settings
 decoder =
-    JD.field get toSettings
+    JD.field uid toSettings
 
 
 toSettings : JD.Decoder Settings

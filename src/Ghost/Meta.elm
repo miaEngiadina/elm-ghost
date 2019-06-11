@@ -1,4 +1,4 @@
-module Ghost.Meta exposing (Meta, decoder, view)
+module Ghost.Meta exposing (Meta, decoder, uid, view)
 
 import Html exposing (Html)
 import Json.Decode as JD
@@ -14,9 +14,14 @@ type alias Meta =
     }
 
 
+uid : String
+uid =
+    "meta"
+
+
 decoder : JD.Decoder Meta
 decoder =
-    JD.field "meta" (JD.field "pagination" toMeta)
+    JD.field uid (JD.field "pagination" toMeta)
 
 
 toMeta : JD.Decoder Meta

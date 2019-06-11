@@ -1,7 +1,9 @@
-module Ghost.Posts exposing (Post, decoder, get, view)
+module Ghost.Post exposing (Post, decoder, uid, view)
 
+import Ghost.Author
 import Ghost.Log as Log
 import Ghost.Misc as Misc
+import Ghost.Tag
 import Html exposing (Html)
 import Html.Parser
 import Json.Decode as JD
@@ -27,6 +29,8 @@ type alias Post =
     , twitter : Misc.TID
     , custom_template : Maybe String
     , canonical_url : Maybe String
+    , authors : List Ghost.Author.Author
+    , tags : List Ghost.Tag.Tag
     , primary_author : Maybe String
     , primary_tag : Maybe String
     , url : String
@@ -34,14 +38,14 @@ type alias Post =
     }
 
 
-get : String
-get =
+uid : String
+uid =
     "posts"
 
 
 decoder : JD.Decoder (List Post)
 decoder =
-    JD.field "posts" (JD.list toPost)
+    JD.field uid (JD.list toPost)
 
 
 toPost : JD.Decoder Post
@@ -64,6 +68,8 @@ toPost =
         |> JDx.andMap (Misc.tidDecoder "twitter")
         |> JDx.andMap (JD.field "custom_template" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "canonical_url" (JD.maybe JD.string))
+        |> JDx.andMap Ghost.Author.decoder
+        |> JDx.andMap Ghost.Tag.decoder
         |> JDx.andMap (JD.field "primary_author" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "primary_tag" (JD.maybe JD.string))
         |> JDx.andMap (JD.field "url" JD.string)
