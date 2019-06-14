@@ -1,8 +1,8 @@
-module Ghost.Meta exposing (Meta, decoder, empty, uid, view)
+module Ghost.Meta exposing (Meta, decoder, empty, uid)
 
 import Html exposing (Html)
-import Json.Decode as JD
-import Json.Decode.Extra as JDx
+import Json.Decode exposing (Decoder, field, int, map, map6, maybe)
+import Json.Decode.Extra exposing (andMap)
 
 
 type alias Meta =
@@ -25,39 +25,19 @@ uid =
     "meta"
 
 
-decoder : JD.Decoder x -> JD.Decoder ( x, Meta )
+decoder : Decoder x -> Decoder ( x, Meta )
 decoder prev =
-    prev |> JD.map Tuple.pair |> JDx.andMap (JD.field uid (JD.field "pagination" toMeta))
+    prev
+        |> map Tuple.pair
+        |> andMap (field uid (field "pagination" toMeta))
 
 
-toMeta : JD.Decoder Meta
+toMeta : Decoder Meta
 toMeta =
-    JD.map6 Meta
-        (JD.field "page" JD.int)
-        (JD.field "limit" JD.int)
-        (JD.field "pages" JD.int)
-        (JD.field "total" JD.int)
-        (JD.field "next" (JD.maybe JD.int))
-        (JD.field "prev" (JD.maybe JD.int))
-
-
-view : Meta -> Html msg
-view meta =
-    Html.div []
-        [ meta.page
-            |> String.fromInt
-            |> (++) "page: "
-            |> Html.text
-        , meta.limit
-            |> String.fromInt
-            |> (++) " -- limit: "
-            |> Html.text
-        , meta.pages
-            |> String.fromInt
-            |> (++) " -- pages: "
-            |> Html.text
-        , meta.total
-            |> String.fromInt
-            |> (++) " -- total: "
-            |> Html.text
-        ]
+    map6 Meta
+        (field "page" int)
+        (field "limit" int)
+        (field "pages" int)
+        (field "total" int)
+        (field "next" (maybe int))
+        (field "prev" (maybe int))

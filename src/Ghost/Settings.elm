@@ -1,10 +1,9 @@
-module Ghost.Settings exposing (Settings, decoder, uid, view)
+module Ghost.Settings exposing (Settings, decoder, uid)
 
-import Ghost.Log as Log
-import Ghost.Misc as Misc
-import Html exposing (Html)
-import Json.Decode as JD
-import Json.Decode.Extra as JDx
+import Ghost.Misc as Misc exposing (try)
+import Json.Decode exposing (Decoder, field, list, map2, string, succeed)
+import Json.Decode.Extra exposing (andMap)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias Settings =
@@ -32,53 +31,30 @@ uid =
     "settings"
 
 
-decoder : JD.Decoder Settings
+decoder : Decoder Settings
 decoder =
-    JD.field uid toSettings
+    field uid toSettings
 
 
-toSettings : JD.Decoder Settings
+toSettings : Decoder Settings
 toSettings =
-    JD.succeed Settings
-        |> JDx.andMap (JD.field "title" JD.string)
-        |> JDx.andMap (JD.field "description" JD.string)
-        |> JDx.andMap (JD.field "logo" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "icon" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "cover_image" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "facebook" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "twitter" (JD.maybe JD.string))
-        |> JDx.andMap (JD.field "lang" JD.string)
-        |> JDx.andMap (JD.field "timezone" (JD.maybe JD.string))
-        |> JDx.andMap (Misc.headerFooterDecoder "ghost")
-        |> JDx.andMap (JD.field "navigation" (JD.list toNavigation))
-        |> JDx.andMap (Misc.headerFooterDecoder "codeinjection")
+    succeed Settings
+        |> required "title" string
+        |> required "description" string
+        |> try "logo" string
+        |> try "icon" string
+        |> try "cover_image" string
+        |> try "facebook" string
+        |> try "twitter" string
+        |> required "lang" string
+        |> try "timezone" string
+        |> andMap (Misc.headerFooterDecoder "ghost")
+        |> required "navigation" (list toNavigation)
+        |> andMap (Misc.headerFooterDecoder "codeinjection")
 
 
-toNavigation : JD.Decoder Navigation
+toNavigation : Decoder Navigation
 toNavigation =
-    JD.map2 Navigation
-        (JD.field "label" JD.string)
-        (JD.field "url" JD.string)
-
-
-view : Settings -> Html msg
-view settings =
-    Html.div []
-        [ Log.string "title" settings.title
-        , Log.string "description" settings.description
-        , Log.string_null "logo" settings.logo
-        , Log.string_null "icon" settings.icon
-        , Log.string_null "cover_image" settings.cover_image
-        , Log.string_null "facebook" settings.facebook
-        , Log.string_null "twitter" settings.twitter
-        , Log.string "lang" settings.lang
-        , Log.string_null "timezone" settings.timezone
-        , Log.string_null "ghost_head" settings.ghost.head
-        , Log.string_null "ghost_foot" settings.ghost.foot
-        , settings.navigation
-            |> List.map (\n -> Html.span [] [ Log.string "label" n.label, Log.string "url" n.url ])
-            |> Html.span []
-        , Log.string_null "codeinjection_head" settings.codeinjection.head
-        , Log.string_null "codeinjection_foot" settings.codeinjection.head
-        , Html.hr [] []
-        ]
+    map2 Navigation
+        (field "label" string)
+        (field "url" string)

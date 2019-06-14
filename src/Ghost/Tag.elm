@@ -1,10 +1,9 @@
-module Ghost.Tag exposing (Tag, decoder, uid, view)
+module Ghost.Tag exposing (Tag, decoder, uid)
 
-import Ghost.Log as Log
-import Ghost.Misc as Misc
-import Html exposing (Html)
-import Json.Decode as JD
-import Json.Decode.Extra as JDx
+import Ghost.Misc as Misc exposing (try)
+import Json.Decode exposing (Decoder, field, list, nullable, string, succeed)
+import Json.Decode.Extra exposing (andMap)
+import Json.Decode.Pipeline exposing (required)
 
 
 type alias Tag =
@@ -24,24 +23,26 @@ uid =
     "tags"
 
 
-decoder : JD.Decoder (List Tag)
+decoder : Decoder (List Tag)
 decoder =
-    JD.field uid (JD.list decodeTag)
+    field uid (list decodeTag)
 
 
-decodeTag : JD.Decoder Tag
+decodeTag : Decoder Tag
 decodeTag =
-    JD.map8 Tag
-        (JD.maybe (JD.field "id" JD.string))
-        (JD.maybe (JD.field "name" JD.string))
-        (JD.maybe (JD.field "slug" JD.string))
-        (JD.maybe (JD.field "description" JD.string))
-        (JD.maybe (JD.field "feature_image" JD.string))
-        (JD.maybe (JD.field "visibility" JD.string))
-        (Misc.tidDecoder "meta")
-        (JD.maybe (JD.field "url" JD.string))
+    succeed Tag
+        |> try "id" string
+        |> try "name" string
+        |> try "slug" string
+        |> try "description" string
+        |> try "feature_image" string
+        |> try "visibility" string
+        |> andMap (Misc.tidDecoder "meta")
+        |> try "url" string
 
 
+
+{--
 view : Tag -> Html msg
 view tag =
     Html.div []
@@ -56,3 +57,4 @@ view tag =
         , Log.string "url" tag.url
         , Html.hr [] []
         ]
+--}

@@ -1,13 +1,10 @@
-module Ghost.Post exposing (Post, decoder, uid, view)
+module Ghost.Post exposing (Post, decoder, uid)
 
 import Ghost.Author
-import Ghost.Log as Log
-import Ghost.Misc as Misc exposing (map)
+import Ghost.Misc as Misc exposing (try)
 import Ghost.Tag
-import Html exposing (Html)
-import Html.Parser
-import Json.Decode as JD
-import Json.Decode.Extra as JDx
+import Json.Decode exposing (Decoder, bool, field, list, maybe, string, succeed)
+import Json.Decode.Extra exposing (andMap)
 import Time
 
 
@@ -16,7 +13,7 @@ type alias Post =
     , uuid : Maybe String
     , title : Maybe String
     , slug : Maybe String
-    , html : Maybe (List Html.Parser.Node)
+    , html : Maybe String
     , comment_id : Maybe String
     , feature_image : Maybe String
     , featured : Maybe Bool
@@ -43,80 +40,34 @@ uid =
     "posts"
 
 
-decoder : JD.Decoder (List Post)
+decoder : Decoder (List Post)
 decoder =
-    JD.field uid (JD.list toPost)
+    field uid (list toPost)
 
 
-toPost : JD.Decoder Post
+toPost : Decoder Post
 toPost =
-    JD.succeed Post
-        |> map (JD.field "id" JD.string)
-        |> map (JD.field "uuid" JD.string)
-        |> map (JD.field "title" JD.string)
-        |> map (JD.field "slug" JD.string)
-        |> map (JD.field "html" (JD.string |> JD.andThen html))
-        |> map (JD.field "comment_id" JD.string)
-        |> map (JD.field "feature_image" JD.string)
-        |> map (JD.field "featured" JD.bool)
-        |> map (JD.field "page" JD.bool)
-        |> JDx.andMap (Misc.tidDecoder "meta")
-        |> JDx.andMap Misc.atDecoder
-        |> map (JD.field "custom_excerpt" JD.string)
-        |> JDx.andMap (Misc.headerFooterDecoder "codeinjection")
-        |> JDx.andMap (Misc.tidDecoder "og")
-        |> JDx.andMap (Misc.tidDecoder "twitter")
-        |> map (JD.field "custom_template" JD.string)
-        |> map (JD.field "canonical_url" JD.string)
-        |> map Ghost.Author.decoder
-        |> map Ghost.Tag.decoder
-        |> map (JD.field "primary_author" JD.string)
-        |> map (JD.field "primary_tag" JD.string)
-        |> map (JD.field "url" JD.string)
-        |> map (JD.field "excerpt" JD.string)
-
-
-html : String -> JD.Decoder (List Html.Parser.Node)
-html code =
-    case Html.Parser.run code of
-        Ok nodes ->
-            JD.succeed nodes
-
-        _ ->
-            JD.succeed []
-
-
-view : Post -> Html msg
-view post =
-    Html.div []
-        [ Log.string "id" post.id_
-        , Log.string "uuid" post.uuid
-        , Log.string "title" post.title
-        , Log.string "slug" post.slug
-        , Log.html "html" post.html
-        , Log.string "comment_id" post.comment_id
-        , Log.string "feature_image" post.feature_image
-        , Log.bool "featured" post.featured
-        , Log.bool "page" post.page
-        , Log.string "meta_title" post.meta.title
-        , Log.string "meta_description" post.meta.description
-        , Log.datetime "created_at" post.at.created
-        , Log.datetime "updated_at" post.at.updated
-        , Log.datetime "published_at" post.at.published
-        , Log.string "custom_excerpt" post.custom_excerpt
-        , Log.string "codeinjection_head" post.codeinjection.head
-        , Log.string "codeinjection_foot" post.codeinjection.foot
-        , Log.string "og_title" post.og.title
-        , Log.string "og_image" post.og.image
-        , Log.string "og_description" post.og.description
-        , Log.string "twitter_image" post.twitter.image
-        , Log.string "twitter_title" post.twitter.title
-        , Log.string "twitter_description" post.twitter.description
-        , Log.string "custom_template" post.custom_template
-        , Log.string "canonical_url" post.canonical_url
-        , Log.string "primary_author" post.primary_author
-        , Log.string "primary_tag" post.primary_tag
-        , Log.string "url" post.url
-        , Log.string "excerpt" post.excerpt
-        , Html.hr [] []
-        ]
+    succeed Post
+        |> try "id" string
+        |> try "uuid" string
+        |> try "title" string
+        |> try "slug" string
+        |> try "html" string
+        |> try "comment_id" string
+        |> try "feature_image" string
+        |> try "featured" bool
+        |> try "page" bool
+        |> andMap (Misc.tidDecoder "meta")
+        |> andMap Misc.atDecoder
+        |> try "custom_excerpt" string
+        |> andMap (Misc.headerFooterDecoder "codeinjection")
+        |> andMap (Misc.tidDecoder "og")
+        |> andMap (Misc.tidDecoder "twitter")
+        |> try "custom_template" string
+        |> try "canonical_url" string
+        |> andMap (maybe Ghost.Author.decoder)
+        |> andMap (maybe Ghost.Tag.decoder)
+        |> try "primary_author" string
+        |> try "primary_tag" string
+        |> try "url" string
+        |> try "excerpt" string

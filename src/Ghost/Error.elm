@@ -4,7 +4,7 @@ module Ghost.Error exposing
     , uid
     )
 
-import Json.Decode as JD
+import Json.Decode exposing (Decoder, field, list, map2, string)
 
 
 type alias Error =
@@ -18,13 +18,13 @@ uid =
     "errors"
 
 
-decoder : JD.Decoder (List Error)
+decoder : Decoder (List Error)
 decoder =
-    JD.field uid (JD.list toError)
+    field uid (list toError)
 
 
-toError : JD.Decoder Error
+toError : Decoder Error
 toError =
-    JD.map2 Error
-        (JD.field "message" JD.string)
-        (JD.field "errorType" JD.string)
+    map2 Error
+        (field "message" string)
+        (field "errorType" string)

@@ -4,14 +4,12 @@ module Ghost.Misc exposing
     , TID
     , atDecoder
     , headerFooterDecoder
-    , map
     , tidDecoder
+    , try
     )
 
-import Ghost.Log as Log
-import Html exposing (Html)
-import Json.Decode as JD
-import Json.Decode.Extra as JDx
+import Json.Decode exposing (Decoder, field, map2, map3, maybe, string)
+import Json.Decode.Extra exposing (andMap, datetime)
 import Time
 
 
@@ -22,12 +20,12 @@ type alias TID =
     }
 
 
-tidDecoder : String -> JD.Decoder TID
+tidDecoder : String -> Decoder TID
 tidDecoder key =
-    JD.map3 TID
-        (JD.maybe (JD.field (key ++ "_title") JD.string))
-        (JD.maybe (JD.field (key ++ "_image") JD.string))
-        (JD.maybe (JD.field (key ++ "_description") JD.string))
+    map3 TID
+        (maybe (field (key ++ "_title") string))
+        (maybe (field (key ++ "_image") string))
+        (maybe (field (key ++ "_description") string))
 
 
 type alias At =
@@ -37,12 +35,12 @@ type alias At =
     }
 
 
-atDecoder : JD.Decoder At
+atDecoder : Decoder At
 atDecoder =
-    JD.map3 At
-        (JD.maybe (JD.field "created_at" JDx.datetime))
-        (JD.maybe (JD.field "updated_at" JDx.datetime))
-        (JD.maybe (JD.field "published_at" JDx.datetime))
+    map3 At
+        (maybe (field "created_at" datetime))
+        (maybe (field "updated_at" datetime))
+        (maybe (field "published_at" datetime))
 
 
 type alias HeaderFooter =
@@ -51,13 +49,13 @@ type alias HeaderFooter =
     }
 
 
-headerFooterDecoder : String -> JD.Decoder HeaderFooter
+headerFooterDecoder : String -> Decoder HeaderFooter
 headerFooterDecoder key =
-    JD.map2 HeaderFooter
-        (JD.maybe (JD.field (key ++ "_head") JD.string))
-        (JD.maybe (JD.field (key ++ "_foot") JD.string))
+    map2 HeaderFooter
+        (maybe (field (key ++ "_head") string))
+        (maybe (field (key ++ "_foot") string))
 
 
-map : JD.Decoder a -> JD.Decoder (Maybe a -> b) -> JD.Decoder b
-map =
-    JD.maybe >> JDx.andMap
+try : String -> Decoder a -> Decoder (Maybe a -> b) -> Decoder b
+try key dec =
+    field key dec |> maybe |> andMap

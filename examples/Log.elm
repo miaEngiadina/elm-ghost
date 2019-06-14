@@ -1,8 +1,9 @@
-module Ghost.Log exposing
+module Log exposing
     ( bool
     , datetime
     , html
     , int
+    , log
     , string
     )
 
@@ -10,6 +11,17 @@ import Html exposing (Html)
 import Html.Parser
 import Html.Parser.Util as Util
 import Time
+
+
+log : String -> String -> Html msg
+log title content =
+    Html.span []
+        [ content
+            |> (++) ": "
+            |> (++) title
+            |> Html.text
+        , Html.br [] []
+        ]
 
 
 string : String -> Maybe String -> Html msg

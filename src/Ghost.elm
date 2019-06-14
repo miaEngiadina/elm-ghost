@@ -33,8 +33,7 @@ import Ghost.Post as Post
 import Ghost.Settings as Settings
 import Ghost.Tag as Tag
 import Http
-import Json.Decode as JD
-import Json.Decode.Extra as JDx
+import Json.Decode exposing (Decoder, decodeString)
 import Task
 
 
@@ -91,7 +90,7 @@ httpErr =
     HttpError >> Err
 
 
-responseHandler : JD.Decoder a -> Http.Response String -> Result Error a
+responseHandler : Decoder a -> Http.Response String -> Result Error a
 responseHandler decoder response =
     case response of
         Http.BadUrl_ url ->
@@ -102,7 +101,7 @@ responseHandler decoder response =
 
         Http.BadStatus_ { statusCode } info ->
             if statusCode == 422 then
-                case JD.decodeString Error.decoder info of
+                case decodeString Error.decoder info of
                     Ok json ->
                         json |> GhostError |> Err
 
@@ -116,15 +115,15 @@ responseHandler decoder response =
             httpErr Http.NetworkError
 
         Http.GoodStatus_ _ body ->
-            case JD.decodeString decoder body of
-                Err _ ->
+            case decodeString decoder body of
+                Err info ->
                     httpErr (Http.BadBody body)
 
                 Ok rslt ->
                     Ok rslt
 
 
-http : JD.Decoder a -> String -> Config -> (Result Error a -> msg) -> Params -> Cmd msg
+http : Decoder a -> String -> Config -> (Result Error a -> msg) -> Params -> Cmd msg
 http decoder get ghost msg params =
     { method = "get"
     , headers = []
