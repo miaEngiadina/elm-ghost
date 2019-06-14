@@ -12,9 +12,8 @@ module Example exposing
 import Browser
 import Ghost
 import Ghost.Params
-import Html exposing (Html, pre, text)
+import Html exposing (Html)
 import Html.Events exposing (onClick)
-import Http
 import Log
 
 
@@ -98,7 +97,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 

@@ -3,7 +3,6 @@ module Ghost.Author exposing (Author, decoder, uid)
 import Ghost.Misc as Misc exposing (try)
 import Json.Decode exposing (Decoder, field, list, string, succeed)
 import Json.Decode.Extra exposing (andMap)
-import Json.Decode.Pipeline exposing (required)
 
 
 type alias Author =

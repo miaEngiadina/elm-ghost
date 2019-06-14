@@ -1,6 +1,5 @@
 module Ghost.Meta exposing (Meta, decoder, empty, uid)
 
-import Html exposing (Html)
 import Json.Decode exposing (Decoder, field, int, map, map6, maybe)
 import Json.Decode.Extra exposing (andMap)
 

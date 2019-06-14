@@ -105,7 +105,7 @@ responseHandler decoder response =
                     Ok json ->
                         json |> GhostError |> Err
 
-                    Err msg ->
+                    Err _ ->
                         httpErr (Http.BadBody info)
 
             else
@@ -116,7 +116,7 @@ responseHandler decoder response =
 
         Http.GoodStatus_ _ body ->
             case decodeString decoder body of
-                Err info ->
+                Err _ ->
                     httpErr (Http.BadBody body)
 
                 Ok rslt ->

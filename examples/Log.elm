@@ -65,7 +65,7 @@ datetime title content =
                     (Time.toDay Time.utc posixTime |> String.fromInt)
                         ++ ". "
 
-            Nothing ->
+            _ ->
                 Nothing
 
 

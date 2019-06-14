@@ -23,7 +23,9 @@ type alias Settings =
 
 
 type alias Navigation =
-    { label : String, url : String }
+    { label : String
+    , url : String
+    }
 
 
 uid : String
