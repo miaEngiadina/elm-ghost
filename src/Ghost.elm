@@ -1,34 +1,24 @@
 module Ghost exposing
-    ( Author
-    , Config
-    , Error(..)
-    , Meta
-    , Params
-    , Post
-    , Settings
-    , Tag
-    , authors
-    , authorsById
-    , authorsBySlug
-    , config
-    , errorToString
-    , pages
-    , pagesById
-    , pagesBySlug
-    , posts
-    , postsById
-    , postsBySlug
-    , settings
-    , tags
-    , tagsById
-    , tagsBySlug
-    , urlFrom
+    ( Author, Config, Error(..), Meta, Post, Settings, Tag
+    , authors, authorsById, authorsBySlug, config, errorToString, pages, pagesById, pagesBySlug, posts, postsById, postsBySlug, settings, tags, tagsById, tagsBySlug
     )
+
+{-| This module contains all functions to access any kind of ghost related
+resource, these are `Config`,
+`Author`s, `Error`s, `Mata`, `Post`s, `Settings`s, `Tag`s.
+
+See <https://docs.ghost.org/api/content/#resources>
+
+@docs Author, Config, Error, Meta, Post, Settings, Tag
+
+@docs authors, authorsById, authorsBySlug, config, errorToString, pages, pagesById, pagesBySlug, posts, postsById, postsBySlug, settings, tags, tagsById, tagsBySlug
+
+-}
 
 import Ghost.Author as Author
 import Ghost.Error as Error
 import Ghost.Meta as Meta
-import Ghost.Params as Params
+import Ghost.Params as Params exposing (Params)
 import Ghost.Post as Post
 import Ghost.Settings as Settings
 import Ghost.Tag as Tag
@@ -37,6 +27,16 @@ import Json.Decode exposing (Decoder, decodeString)
 import Task
 
 
+{-| A record for the basic ghost configuration:
+
+    Config url key "v2"
+
+The version currently is always "v2", which might change later. The key to
+access the api has to be generated as described in:
+
+<https://docs.ghost.org/api/content/#key>
+
+-}
 type alias Config =
     { url : String
     , key : String
@@ -44,30 +44,42 @@ type alias Config =
     }
 
 
-type alias Params =
-    Params.Params
-
-
+{-| A record for all author related information.
+-}
 type alias Author =
     Author.Author
 
 
+{-| `Meta` information are part of every HTTP response, except for `settings`
+and contain pagination related information:
+
+<https://docs.ghost.org/api/content/#pagination>
+
+-}
 type alias Meta =
     Meta.Meta
 
 
+{-| A record for all post related information.
+-}
 type alias Post =
     Post.Post
 
 
+{-| A record for all tag related information.
+-}
 type alias Tag =
     Tag.Tag
 
 
+{-| A record for all setting related information.
+-}
 type alias Settings =
     Settings.Settings
 
 
+{-| A Ghost Error is a combined type of `GhostError` and `HttpError`.
+-}
 type Error
     = GhostError (List Error.Error)
     | HttpError Http.Error
@@ -136,6 +148,13 @@ http decoder get ghost msg params =
         |> Task.attempt msg
 
 
+{-| Request authors from the ghost api, see <https://docs.ghost.org/api/content/#authors>
+
+    Params.empty
+    |> ...
+    |> authors (Config url key "v2") GotAuthors
+
+-}
 authors : Config -> (Result Error ( List Author, Meta ) -> msg) -> Params -> Cmd msg
 authors =
     http
@@ -143,20 +162,41 @@ authors =
         Author.uid
 
 
+{-| Request authors from the ghost api, see <https://docs.ghost.org/api/content/#authors>
+
+    Params.empty
+    |> ...
+    |> authorsById id (Config url key "v2") GotAuthors
+
+-}
 authorsById : String -> Config -> (Result Error ( List Author, Meta ) -> msg) -> Params -> Cmd msg
-authorsById id_ =
+authorsById id =
     http
         (Meta.decoder Author.decoder)
-        (Author.uid ++ "/" ++ id_)
+        (Author.uid ++ "/" ++ id)
 
 
+{-| Request authors from the ghost api, see <https://docs.ghost.org/api/content/#authors>
+
+    Params.empty
+    |> ...
+    |> authorsBySlug id (Config url key "v2") GotAuthors
+
+-}
 authorsBySlug : String -> Config -> (Result Error ( List Author, Meta ) -> msg) -> Params -> Cmd msg
-authorsBySlug id_ =
+authorsBySlug id =
     http
         (Meta.decoder Author.decoder)
-        (Author.uid ++ "/slug" ++ id_)
+        (Author.uid ++ "/slug" ++ id)
 
 
+{-| Request pages from the ghost api, see <https://docs.ghost.org/api/content/#pages>
+
+    Params.empty
+    |> ...
+    |> pages (Config url key "v2") GotPages
+
+-}
 pages : Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
 pages =
     http
@@ -164,20 +204,41 @@ pages =
         "pages"
 
 
+{-| Request pages from the ghost api, see <https://docs.ghost.org/api/content/#pages>
+
+    Params.empty
+    |> ...
+    |> pagesById id (Config url key "v2") GotPages
+
+-}
 pagesById : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
-pagesById id_ =
+pagesById id =
     http
         (Meta.decoder Post.decoder)
-        ("pages/" ++ id_)
+        ("pages/" ++ id)
 
 
+{-| Request pages from the ghost api, see <https://docs.ghost.org/api/content/#pages>
+
+    Params.empty
+    |> ...
+    |> pagesBySlug id (Config url key "v2") GotPages
+
+-}
 pagesBySlug : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
-pagesBySlug id_ =
+pagesBySlug id =
     http
         (Meta.decoder Post.decoder)
-        ("pages/slug/" ++ id_)
+        ("pages/slug/" ++ id)
 
 
+{-| Request posts from the ghost api, see <https://docs.ghost.org/api/content/#posts>
+
+    Params.empty
+    |> ...
+    |> posts (Config url key "v2") GotPosts
+
+-}
 posts : Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
 posts =
     http
@@ -185,20 +246,43 @@ posts =
         Post.uid
 
 
+{-| Request posts from the ghost api, see <https://docs.ghost.org/api/content/#posts>
+
+    Params.empty
+    |> ...
+    |> postsById id (Config url key "v2") GotPosts
+
+-}
 postsById : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
-postsById id_ =
+postsById id =
     http
         (Meta.decoder Post.decoder)
-        (Post.uid ++ "/" ++ id_)
+        (Post.uid ++ "/" ++ id)
 
 
+{-| Request posts from the ghost api, see <https://docs.ghost.org/api/content/#posts>
+
+    Params.empty
+    |> ...
+    |> postsBySlug id (Config url key "v2") GotPosts
+
+-}
 postsBySlug : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
-postsBySlug id_ =
+postsBySlug id =
     http
         (Meta.decoder Post.decoder)
-        (Post.uid ++ "/slug/" ++ id_)
+        (Post.uid ++ "/slug/" ++ id)
 
 
+{-| Request tags from the ghost api, see <https://docs.ghost.org/api/content/#settings>
+
+    Params.empty
+    |> ...
+    |> tagsBySlug id (Config url key "v2") GotSettings
+
+In contrast to all other requests, you will receive a single record.
+
+-}
 settings : Config -> (Result Error Settings -> msg) -> Params -> Cmd msg
 settings =
     http
@@ -206,6 +290,14 @@ settings =
         Settings.uid
 
 
+{-| Request tags from the ghost api, see <https://docs.ghost.org/api/content/#tags>
+
+    Params.empty
+    |> Params.fields ...
+    |> ...
+    |> tags (Config url key "v2") GotTags
+
+-}
 tags : Config -> (Result Error ( List Tag, Meta ) -> msg) -> Params -> Cmd msg
 tags =
     http
@@ -213,20 +305,39 @@ tags =
         Tag.uid
 
 
+{-| Request tags from the ghost api, see <https://docs.ghost.org/api/content/#tags>
+
+    Params.empty
+    |> Params.fields ...
+    |> ...
+    |> tagsById id (Config url key "v2") GotTags
+
+-}
 tagsById : String -> Config -> (Result Error ( List Tag, Meta ) -> msg) -> Params -> Cmd msg
-tagsById id_ =
+tagsById id =
     http
         (Meta.decoder Tag.decoder)
-        (Tag.uid ++ "/" ++ id_)
+        (Tag.uid ++ "/" ++ id)
 
 
+{-| Request tags from the ghost api, see <https://docs.ghost.org/api/content/#tags>
+
+    Params.empty
+    |> Params.fields ...
+    |> ...
+    |> tagsBySlug id (Config url key "v2") GotTags
+
+-}
 tagsBySlug : String -> Config -> (Result Error ( List Tag, Meta ) -> msg) -> Params -> Cmd msg
-tagsBySlug id_ =
+tagsBySlug id =
     http
         (Meta.decoder Tag.decoder)
-        (Tag.uid ++ "/slug/" ++ id_)
+        (Tag.uid ++ "/slug/" ++ id)
 
 
+{-| A clean way of initializing the basic configuration settings, that takes
+care of the url-ending.
+-}
 config : String -> String -> String -> Config
 config url =
     Config <|
@@ -237,6 +348,9 @@ config url =
             url
 
 
+{-| Pass in a `Ghost.Error` and it will return a string of wheater it is
+a `HttpError` or a ghost related Error.
+-}
 errorToString : Error -> String
 errorToString error =
     case error of

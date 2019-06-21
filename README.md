@@ -1,14 +1,21 @@
 # elm-ghost
 
-todo
-
+This is basically a port of the ghost-blog API to elm. See the documentation at
+https://docs.ghost.org/api/content for all details.
 
 ## Usage
 
-todo
+There are only two modules that need to be included `Ghost` and `Ghost.Params`.
+The first contains all functions and types that are required to talk to your
+ghost blog, while the later is used to defined any kind of configuration.
 
 ``` elm
-todo
+import Ghost
+import Ghost.Params
+```
+
+``` elm
+
 ```
 
 ## Examples
