@@ -36,7 +36,7 @@ main =
 
 
 type State
-    = Loading
+    = NoOp
     | Failure String
     | Success
 
@@ -57,7 +57,7 @@ init _ =
             "v2"
         )
         Nothing
-        Loading
+        NoOp
     , Cmd.none
     )
 
@@ -78,18 +78,16 @@ update msg model =
                 |> Ghost.posts model.ghost GotText
             )
 
-        GotText result ->
-            case result of
-                Ok ( fullText, _ ) ->
-                    ( { model
-                        | state = Success
-                        , rslt = Just fullText
-                      }
-                    , Cmd.none
-                    )
+        GotText (Ok ( list, _ )) ->
+            ( { model
+                | state = Success
+                , rslt = Just list
+              }
+            , Cmd.none
+            )
 
-                Err info ->
-                    ( { model | state = Failure <| Ghost.errorToString info }, Cmd.none )
+        GotText (Err info) ->
+            ( { model | state = Failure <| Ghost.errorToString info }, Cmd.none )
 
 
 
@@ -113,8 +111,8 @@ view model =
             Failure info ->
                 Html.text info
 
-            Loading ->
-                Html.text "Loading..."
+            NoOp ->
+                Html.text ""
 
             Success ->
                 case model.rslt of
