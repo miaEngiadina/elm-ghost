@@ -111,10 +111,10 @@ view model =
         [ Html.button [ onClick Load ] [ Html.text "load" ]
         , case model.state of
             Failure info ->
-                text info
+                Html.text info
 
             Loading ->
-                text "Loading..."
+                Html.text "Loading..."
 
             Success ->
                 case model.rslt of
