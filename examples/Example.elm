@@ -64,7 +64,7 @@ init _ =
 
 type Msg
     = Load
-    | GotText (Result Ghost.Error ( List Ghost.Post, Ghost.Meta ))
+    | GotText (Result Ghost.Error (List Ghost.Post))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -74,11 +74,11 @@ update msg model =
             ( model
             , Ghost.Params.empty
                 |> Ghost.Params.limit 1
-                |> Ghost.Params.fields "id,title,html"
-                |> Ghost.posts model.ghost GotText
+                --|> Ghost.Params.fields "id,title,html"
+                |> Ghost.postsById "5cfb69888e2f9c000120ea27" model.ghost GotText
             )
 
-        GotText (Ok ( list, _ )) ->
+        GotText (Ok list) ->
             ( { model
                 | state = Success
                 , rslt = Just list
@@ -133,7 +133,7 @@ view model =
 viewAuthor : Ghost.Author -> Html msg
 viewAuthor author =
     Html.div []
-        [ Log.string "id" author.id_
+        [ Log.string "id" author.id
         , Log.string "name" author.name
         , Log.string "slug" author.slug
         , Log.string "profile_image" author.profile_image
@@ -174,7 +174,7 @@ viewMeta meta =
 viewPost : Ghost.Post -> Html msg
 viewPost post =
     Html.div []
-        [ Log.string "id" post.id_
+        [ Log.string "id" post.id
         , Log.string "uuid" post.uuid
         , Log.string "title" post.title
         , Log.string "slug" post.slug
@@ -210,7 +210,7 @@ viewPost post =
 viewTag : Ghost.Tag -> Html msg
 viewTag tag =
     Html.div []
-        [ Log.string "id" tag.id_
+        [ Log.string "id" tag.id
         , Log.string "name" tag.name
         , Log.string "slug" tag.slug
         , Log.string "description" tag.description

@@ -8,7 +8,7 @@ import Json.Decode.Extra exposing (andMap)
 
 
 type alias Post =
-    { id_ : Maybe String
+    { id : Maybe String
     , uuid : Maybe String
     , title : Maybe String
     , slug : Maybe String

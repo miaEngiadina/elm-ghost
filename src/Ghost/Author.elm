@@ -6,7 +6,7 @@ import Json.Decode.Extra exposing (andMap)
 
 
 type alias Author =
-    { id_ : Maybe String
+    { id : Maybe String
     , name : Maybe String
     , slug : Maybe String
     , profile_image : Maybe String

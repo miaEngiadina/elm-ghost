@@ -8,8 +8,9 @@ module Ghost.Misc exposing
     , try
     )
 
-import Json.Decode exposing (Decoder, field, map2, map3, maybe, string)
+import Json.Decode exposing (Decoder, field, map2, map3, maybe, nullable, string, succeed)
 import Json.Decode.Extra exposing (andMap, datetime)
+import Json.Decode.Pipeline exposing (optional)
 import Time
 
 
@@ -22,10 +23,10 @@ type alias TID =
 
 tidDecoder : String -> Decoder TID
 tidDecoder key =
-    map3 TID
-        (maybe (field (key ++ "_title") string))
-        (maybe (field (key ++ "_image") string))
-        (maybe (field (key ++ "_description") string))
+    succeed TID
+        |> try (key ++ "_title") string
+        |> try (key ++ "_image") string
+        |> try (key ++ "_description") string
 
 
 type alias At =
@@ -37,10 +38,10 @@ type alias At =
 
 atDecoder : Decoder At
 atDecoder =
-    map3 At
-        (maybe (field "created_at" datetime))
-        (maybe (field "updated_at" datetime))
-        (maybe (field "published_at" datetime))
+    succeed At
+        |> try "created_at" datetime
+        |> try "updated_at" datetime
+        |> try "published_at" datetime
 
 
 type alias HeaderFooter =
@@ -51,11 +52,11 @@ type alias HeaderFooter =
 
 headerFooterDecoder : String -> Decoder HeaderFooter
 headerFooterDecoder key =
-    map2 HeaderFooter
-        (maybe (field (key ++ "_head") string))
-        (maybe (field (key ++ "_foot") string))
+    succeed HeaderFooter
+        |> try (key ++ "_head") string
+        |> try (key ++ "_foot") string
 
 
 try : String -> Decoder a -> Decoder (Maybe a -> b) -> Decoder b
 try key dec =
-    field key dec |> maybe |> andMap
+    optional key (maybe dec) Nothing

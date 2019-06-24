@@ -128,7 +128,7 @@ responseHandler decoder response =
 
         Http.GoodStatus_ _ body ->
             case decodeString decoder body of
-                Err _ ->
+                Err e ->
                     httpErr (Http.BadBody body)
 
                 Ok rslt ->
@@ -169,10 +169,10 @@ authors =
     |> authorsById id (Config url key "v2") GotAuthors
 
 -}
-authorsById : String -> Config -> (Result Error ( List Author, Meta ) -> msg) -> Params -> Cmd msg
+authorsById : String -> Config -> (Result Error (List Author) -> msg) -> Params -> Cmd msg
 authorsById id =
     http
-        (Meta.decoder Author.decoder)
+        Author.decoder
         (Author.uid ++ "/" ++ id)
 
 
@@ -183,10 +183,10 @@ authorsById id =
     |> authorsBySlug id (Config url key "v2") GotAuthors
 
 -}
-authorsBySlug : String -> Config -> (Result Error ( List Author, Meta ) -> msg) -> Params -> Cmd msg
+authorsBySlug : String -> Config -> (Result Error (List Author) -> msg) -> Params -> Cmd msg
 authorsBySlug id =
     http
-        (Meta.decoder Author.decoder)
+        Author.decoder
         (Author.uid ++ "/slug" ++ id)
 
 
@@ -211,10 +211,10 @@ pages =
     |> pagesById id (Config url key "v2") GotPages
 
 -}
-pagesById : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
+pagesById : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 pagesById id =
     http
-        (Meta.decoder Post.decoder)
+        Post.decoder
         ("pages/" ++ id)
 
 
@@ -225,10 +225,10 @@ pagesById id =
     |> pagesBySlug id (Config url key "v2") GotPages
 
 -}
-pagesBySlug : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
+pagesBySlug : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 pagesBySlug id =
     http
-        (Meta.decoder Post.decoder)
+        Post.decoder
         ("pages/slug/" ++ id)
 
 
@@ -253,10 +253,10 @@ posts =
     |> postsById id (Config url key "v2") GotPosts
 
 -}
-postsById : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
+postsById : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 postsById id =
     http
-        (Meta.decoder Post.decoder)
+        Post.decoder
         (Post.uid ++ "/" ++ id)
 
 
@@ -267,10 +267,10 @@ postsById id =
     |> postsBySlug id (Config url key "v2") GotPosts
 
 -}
-postsBySlug : String -> Config -> (Result Error ( List Post, Meta ) -> msg) -> Params -> Cmd msg
+postsBySlug : String -> Config -> (Result Error (List Post) -> msg) -> Params -> Cmd msg
 postsBySlug id =
     http
-        (Meta.decoder Post.decoder)
+        Post.decoder
         (Post.uid ++ "/slug/" ++ id)
 
 
@@ -313,10 +313,10 @@ tags =
     |> tagsById id (Config url key "v2") GotTags
 
 -}
-tagsById : String -> Config -> (Result Error ( List Tag, Meta ) -> msg) -> Params -> Cmd msg
+tagsById : String -> Config -> (Result Error (List Tag) -> msg) -> Params -> Cmd msg
 tagsById id =
     http
-        (Meta.decoder Tag.decoder)
+        Tag.decoder
         (Tag.uid ++ "/" ++ id)
 
 
@@ -328,10 +328,10 @@ tagsById id =
     |> tagsBySlug id (Config url key "v2") GotTags
 
 -}
-tagsBySlug : String -> Config -> (Result Error ( List Tag, Meta ) -> msg) -> Params -> Cmd msg
+tagsBySlug : String -> Config -> (Result Error (List Tag) -> msg) -> Params -> Cmd msg
 tagsBySlug id =
     http
-        (Meta.decoder Tag.decoder)
+        Tag.decoder
         (Tag.uid ++ "/slug/" ++ id)
 
 
